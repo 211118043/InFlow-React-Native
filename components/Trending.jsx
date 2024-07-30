@@ -6,6 +6,8 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  View,
+  Text,
 } from "react-native";
 
 import { icons } from "../constants";
@@ -76,17 +78,26 @@ const TrendingItem = ({ activeItem, item }) => {
 };
 
 const Trending = ({ posts }) => {
-  const [activeItem, setActiveItem] = useState(posts[0]);
+  if (!posts || posts.length === 0) {
+    return (
+      <View>
+        <Text>No posts available</Text>
+      </View>
+    );
+  }
+
+  const recentPosts = posts.slice(-5).reverse();
+  const [activeItem, setActiveItem] = useState(recentPosts[0]?.$id || null);
 
   const viewableItemsChanged = ({ viewableItems }) => {
     if (viewableItems.length > 0) {
-      setActiveItem(viewableItems[0].key);
+      setActiveItem(viewableItems[0].item.$id);
     }
   };
 
   return (
     <FlatList
-      data={posts}
+      data={recentPosts}
       horizontal
       keyExtractor={(item) => item.$id}
       renderItem={({ item }) => (
