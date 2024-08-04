@@ -25,12 +25,17 @@ const Search = () => {
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
           <VideoCard
-            title={item.title}
-            thumbnail={item.thumbnail}
-            video={item.video}
-            creator={item.creator.username}
-            avatar={item.creator.avatar}
+            video={{
+              title: item.title,
+              thumbnail: item.thumbnail,
+              video: item.video,
+              creator: {
+                username: item.creator.username,
+                avatar: item.creator.avatar,
+              }
+            }}
           />
+
         )}
         ListHeaderComponent={() => (
           <>

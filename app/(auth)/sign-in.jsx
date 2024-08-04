@@ -35,6 +35,7 @@ const SignIn = () => {
       setUser(result);
       setIsLoggedIn(true);
       //set it global state
+     
       router.replace("/home")
     }
     catch(error){

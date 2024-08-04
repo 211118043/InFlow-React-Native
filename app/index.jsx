@@ -11,10 +11,12 @@ import { useGlobalContext } from '../context/GlobalProvider';
 
 
 
-export default function App() {
+const App = () => {
 
   const { isLoading, isLoggedIn } = useGlobalContext();
+
   if (!isLoading && isLoggedIn) return <Redirect href="/home" />
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="bg-primary h-full">
@@ -66,7 +68,7 @@ export default function App() {
 
 }
 
-
+export default App;
 // <View className="flex-1 items-center justify-center bg-white">
 //   <Text className="text-3xl font-pblack">crybabymelcegm</Text>
 //   <StatusBar style="auto" />

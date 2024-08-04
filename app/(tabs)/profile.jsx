@@ -1,48 +1,93 @@
+import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Image, FlatList, TouchableOpacity } from "react-native";
 
-import { StyleSheet, Text, View, SafeAreaView, Alert } from 'react-native'
-import React from 'react'
-import { Button } from 'react-native';
-import FormField from '../../components/FormField';
-import CustomButton from '../../components/CustomButton';
-import { signOut, getCurrentUser } from '../../lib/appwrite';
-import { useState } from 'react';
+import { icons } from "../../constants";
+import useAppwrite from "../../lib/useAppwrite";
+import { getUserPosts, signOut } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
-import { router } from 'expo-router';
+import EmptyState from "../../components/EmptyState";
+import InfoBox from "../../components/InfoBox";
+import VideoCard from "../../components/VideoCard";
+
 
 const Profile = () => {
-  const { setUser, setIsLoggedIn } = useGlobalContext();
-  const [isSubmitting, setSubmitting] = useState(false);
-  const submit = async () => {
-    setSubmitting(true)
-    try {
-      const result = await getCurrentUser();
-      await signOut();      
-      setUser(result);
-      setIsLoggedIn(true);
-      router.replace("/sign-in")
-    }
-    catch (error) {
-      Alert.alert('Error', error.message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
+  const { user, setUser, setIsLoggedIn } = useGlobalContext();
+  const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
 
+  const logout = async () => {
+    await signOut();
+    setUser(null);
+    setIsLoggedIn(false);
+
+    router.replace("/sign-in");
+  };
 
   return (
-    <SafeAreaView className="flex-1 justify-center items-center">
-      <CustomButton
-        title="Sign out"
-        handlePress={submit}
-        containerStyles="mt-7"
-        isLoading={isSubmitting}
+    <SafeAreaView className="bg-primary h-full">
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.$id}
+        renderItem={({ item }) => (
+          <VideoCard
+            title={item.title}
+            thumbnail={item.thumbnail}
+            video={item.video}
+            creator={item.creator.username}
+            avatar={item.creator.avatar}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <EmptyState
+            title="No Videos Found"
+            subtitle="No videos found for this profile"
+          />
+        )}
+        ListHeaderComponent={() => (
+          <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
+            <TouchableOpacity
+              onPress={logout}
+              className="flex w-full items-end mb-10"
+            >
+              <Image
+                source={icons.logout_}
+                resizeMode="contain"
+                className="w-6 h-6"
+              />
+            </TouchableOpacity>
+
+            <View className="w-16 h-16 border border-secondary rounded-lg flex justify-center items-center">
+              <Image
+                source={{ uri: user?.avatar }}
+                className="w-[90%] h-[90%] rounded-lg"
+                resizeMode="cover"
+              />
+            </View>
+
+            <InfoBox
+              title={user?.username}
+              containerStyles="mt-5"
+              titleStyles="text-lg"
+            />
+
+            <View className="mt-5 flex flex-row">
+              <InfoBox
+                title={posts.length || 0}
+                subtitle="Posts"
+                titleStyles="text-xl"
+                containerStyles="mr-10"
+              />
+              <InfoBox
+                title="1.2k"
+                subtitle="Followers"
+                titleStyles="text-xl"
+              />
+            </View>
+          </View>
+        )}
       />
     </SafeAreaView>
   );
+};
 
-}
-
-
-export default Profile
-
-const styles = StyleSheet.create({})
+export default Profile;
