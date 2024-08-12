@@ -10,7 +10,7 @@ import VideoCard from '../../components/VideoCard';
 import { useGlobalContext } from '../../context/GlobalProvider';
 
 const Home = () => {
-
+  const { user } = useGlobalContext();
   const { data: posts, refetch } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
 
@@ -21,7 +21,7 @@ const Home = () => {
     await refetch();
     setRefreshing(false);
   };
-  
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList className="mt-8"
@@ -29,7 +29,13 @@ const Home = () => {
         data={posts}
         keyExtractor={(item) => item.$id.toString()}  // 'id' kullanıyoruz
         renderItem={({ item }) => (
-          <VideoCard video ={item} />
+          <VideoCard
+          title={item.title}
+          thumbnail={item.thumbnail}
+          video={item.video}
+          creator={item.creator.username}
+          avatar={item.creator.avatar}
+        />
         )}
         ListHeaderComponent={() => (
           <View className="my-6 px-4 space-y-6">
@@ -38,8 +44,8 @@ const Home = () => {
                 <Text className="font-pmedium text-sm text-gray-100">
                   Welcome back,
                 </Text>
-                <Text className="text-2xl font-psemibold text-white" >Meltemm</Text>
-                {/* <Text className="text-2xl font-psemibold text-white" >{user?.username}</Text> */}
+                {/* <Text className="text-2xl font-psemibold text-white" >Meltemm</Text> */}
+                <Text className="text-2xl font-psemibold text-white" >{user?.username}</Text>
               </View>
 
               <View className="mt-1.5">
